@@ -1,0 +1,149 @@
+$(window).on('scroll', function () {
+
+    if ($(window).scrollTop() > 200) {
+
+        $('.header2').addClass('header-bgnone animated fadeInDown');
+        $('#menuLogo').addClass('header-logo animated fadeInDown');
+    }
+    else {
+
+        $('.header2').removeClass('header-bgnone animated fadeInDown');
+        $('#menuLogo').removeClass('header-logo animated fadeInDown');
+
+    }
+
+});
+$(function () {
+
+    $('a.page-scroll').bind('click', function (event) {
+        var $anchor = $(this);
+        $('html, body').stop().animate({
+            scrollTop: $($anchor.attr('href')).offset().top - 62
+        }, 1000, 'easeInOutExpo');
+        event.preventDefault();
+    });
+    $('body').scrollspy({ target: '#header', offset: 72 });
+});
+
+if (window.location.hash) {
+    $('html, body').stop().animate({
+        scrollTop: $(window.location.hash).offset().top - 62
+    }, 1000, 'easeInOutExpo');
+}
+function menu(elemScrolled) {
+    for (var x = 0; x < $("[data-menu]").length; x++) {
+        var index = x;
+        if (!(index == elemScrolled)) {
+            $("[data-menu='" + index + "']").addClass("sideSpanInactive").removeClass("sideSpanActive");
+            if (!$("[data-menu='" + index + "']").siblings(".sideSpanActive").length > 0) { //para os submenus, mantem a faixa verde no container
+                $("[data-menu='" + index + "']").parents(".containerMenu").addClass("sideContainerInactive").removeClass("sideContainerActive");
+            } else {
+                $("[data-menu='" + index + "']").siblings(".titleSideMenu").addClass("sideSpanActive").removeClass("sideSpanInactive");
+            }
+          
+        } else {
+            $("[data-menu='" + index + "']").addClass("sideSpanActive").removeClass("sideSpanInactive");
+            $("[data-menu='" + index + "']").parents(".containerMenu").addClass("sideContainerActive").removeClass("sideContainerInactive");
+        }
+    }
+  
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//SCROLL BY SIDE MENU CLICK
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FormProp.scrollByClick = function (elClicked) {
+
+    var clicked = $(elClicked).attr("data-menu");
+    var target;
+    if ($('#titular1').is(':visible')) {
+        target = clicked;
+    }
+
+    if ($("#empresa").is(':visible')) {
+        if (clicked > 0 && clicked < 6) {
+            target = clicked + "e";
+        } else {
+            target = clicked;
+        }
+    }
+    $('html, body').animate({
+        scrollTop: ($("[data-target='" + target + "']").first().offset().top - 200)
+    }, 500);
+}
+function menuErrors() {
+    for (var x = 0; x < $("[data-menu]").length; x++) {
+        var index = x;
+        //not submitted (empty not consider)
+        if (FormProp.tryToSubmit == false) {
+            //se houver inválidos
+            if ($("[data-target='" + index + "']").parent().siblings().find(".invalid").length !== 0) {
+                $("[data-menu='" + index + "']").addClass("error");
+                $("[data-menu='" + index + "']").siblings(".titleSideMenu").removeClass("error");
+                $("[data-menu='" + index + "']").parents(".containerMenu").addClass("sideContainerError");
+                if ($("[data-menu='" + index + "']").siblings().length > 0) {
+                    //if (!$("[data-menu='" + index + "']").siblings(".sideSpanActive").length > 0) {
+                    $("[data-menu='" + index + "']").siblings(".titleSideMenu").addClass("error");
+                    //$("[data-menu='" + index + "']").parents(".containerMenu").addClass("sideContainerError");
+                } 
+
+            } else {
+                $("[data-menu='" + index + "']").removeClass("error");
+                // se tem sub-menus
+                if ($("[data-menu='" + index + "']").siblings().length > 0) {
+                    // se nenhum sub-menu tiver erros
+                    if ($("[data-menu='" + index + "']").siblings(".error").length < 1) {
+                        $("[data-menu='" + index + "']").parents(".containerMenu").removeClass("sideContainerError");
+                    }
+                }
+                // se não tem sub-menus
+                else {
+                    $("[data-menu='" + index + "']").parents(".containerMenu").removeClass("sideContainerError");
+                }
+            }
+            //submitted   (empty consider)   
+        } else {      
+            //se houver inválidos ou empty
+            if ($("[data-target='" + index + "']").parent().siblings().find(".invalid").length !== 0 || ($("[data-target='" + index + "']").parent().siblings().find(".emptyField").length !== 0)) {
+                $("[data-menu='" + index + "']").addClass("error");
+                $("[data-menu='" + index + "']").siblings(".titleSideMenu").removeClass("error");
+                $("[data-menu='" + index + "']").parents(".containerMenu").addClass("sideContainerError");
+                if ($("[data-menu='" + index + "']").siblings().length > 0) {
+                    $("[data-menu='" + index + "']").siblings(".titleSideMenu").addClass("error");
+                   
+                    }
+            } else {
+            $("[data-menu='" + index + "']").removeClass("error");
+            if ($("[data-menu='" + index + "']").siblings(".error").length < 1) {
+                $("[data-menu='" + index + "']").parents(".containerMenu").removeClass("sideContainerError")
+            }
+            }
+        }
+    }
+}
+$(document).scroll(function () {
+   //debugger;00
+    
+    screenPositionAux = 0;
+    $('.menuTarget:visible').each(function (index, item) {
+
+        var screenPosition = $(this).first().offset().top - $(window).scrollTop();
+
+        //console.log(item.id);
+        //console.log("screenPosition"  + screenPosition);
+        //console.log("screenPositionAux" +screenPositionAux);
+        if (screenPosition > screenPositionAux) {
+          
+            if (screenPosition < 201) {
+                //console.log("menu" + index);
+                menu(index);
+            } else {
+                if (screenPositionAux == 0)
+                    menu(index);
+            }
+            screenPositionAux = screenPosition;
+        
+        } 
+    });
+});
